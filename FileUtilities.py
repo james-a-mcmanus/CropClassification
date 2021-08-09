@@ -3,7 +3,7 @@ import os
 def lines_from_file(textfile):
 	with open(textfile) as f:
 		filelist = f.readlines()
-	return filelist.rstrip()
+	return [file.rstrip() for file in filelist]
 
 def compare_directories(complete_files, drive_files):
 	missing_files = []
