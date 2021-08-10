@@ -1,4 +1,6 @@
-import os
+import os, json, rasterio
+import matplotlib.pyplot as plt
+import numpy as np
 
 def lines_from_file(textfile):
 	"""
@@ -25,3 +27,54 @@ def compare_directories(complete_files, drive_files):
 			missing_files.append(file)
 	return missing_files
 
+def getbyextension(filelist, extension):
+	return [fname for fname in filelist if os.path.splitext(fname)[1] == extension]
+
+class Sentinel2_Loader(object):
+	"""
+	object for loading in the S2 data.
+	filepath: path to the directory containing the .tif and json files.
+	"""
+	def __init__(self, filepath):
+		self.path = filepath
+		self.subfiles = os.listdir(filepath)
+		jsonpath = getbyextension(self.subfiles, '.json')
+		if len(jsonpath) == 1:
+			self.jsonpath = os.path.join(filepath, jsonpath[0])
+		else:
+			raise Exception('There seem to be more than one .json files at that location')
+		self.tif_paths=getbyextension(self.subfiles, '.tif')
+		with open(self.jsonpath, 'r') as f:
+			self.metadata = json.load(f)
+		self.bands = self.get_bands()
+		self.tifs = None
+		self.load_all_tifs()
+
+	def get_bands(self):
+		bandprops = self.metadata['properties']['eo:bands']
+		return [prop['name'] for prop in bandprops]
+	
+	def load_all_tifs(self):
+		tifdict = {}
+		for bandname in self.bands:
+			tifdict[bandname] = self.load_tif(bandname)
+		self.tifs = tifdict
+
+	def load_tif(self, bandname):
+		tifname = os.path.join(self.path, self.metadata['assets'][bandname]['href'])
+		tif = rasterio.open(tifname)
+		return tif.read().squeeze(0)
+
+	def plot_band(self, bandname, ax=None):
+		if ax:
+			return ax.imshow(self.tifs[bandname])
+		else:
+			plt.imshow(self.tifs[bandname])
+			plt.show()
+
+	def plot_tif(self, tif, ax=None):
+		if ax:
+			return ax.imshow(tif)
+		else:
+			plt.imshow(tif)
+			plt.show()
