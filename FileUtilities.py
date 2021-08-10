@@ -30,22 +30,30 @@ def compare_directories(complete_files, drive_files):
 def getbyextension(filelist, extension):
 	return [fname for fname in filelist if os.path.splitext(fname)[1] == extension]
 
-class Sentinel2_Loader(object):
-	"""
-	object for loading in the S2 data.
-	filepath: path to the directory containing the .tif and json files.
-	"""
+
+class DataLoader(object):
 	def __init__(self, filepath):
 		self.path = filepath
 		self.subfiles = os.listdir(filepath)
+		self.tif_paths=getbyextension(self.subfiles, '.tif')
+		self.load_json()
+
+	def load_json(self):
 		jsonpath = getbyextension(self.subfiles, '.json')
 		if len(jsonpath) == 1:
-			self.jsonpath = os.path.join(filepath, jsonpath[0])
+			self.jsonpath = os.path.join(self.path, jsonpath[0])
 		else:
-			raise Exception('There seem to be more than one .json files at that location')
-		self.tif_paths=getbyextension(self.subfiles, '.tif')
+			raise Exception(f'There seems to be {len(jsonpath)} .json files at that location')
 		with open(self.jsonpath, 'r') as f:
 			self.metadata = json.load(f)
+
+class Sentinel2(DataLoader):
+	"""
+	Sentobject for loading in the S2 data.
+	filepath: path to the directory containing the .tif and json files.
+	"""
+	def __init__(self, filepath):
+		super().__init__(filepath)
 		self.bands = self.get_bands()
 		self.tifs = None
 		self.load_all_tifs()
@@ -78,3 +86,9 @@ class Sentinel2_Loader(object):
 		else:
 			plt.imshow(tif)
 			plt.show()
+
+class Label(DataLoader):
+	def __init__(self, filepath):
+		super().__init__(filepath)
+		
+
