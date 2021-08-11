@@ -31,7 +31,7 @@ def getbyextension(filelist, extension):
 	return [fname for fname in filelist if os.path.splitext(fname)[1] == extension]
 
 
-class DataLoader(object):
+class AbstractLoader(object):
 	def __init__(self, filepath):
 		self.path = filepath
 		self.subfiles = os.listdir(filepath)
@@ -47,7 +47,7 @@ class DataLoader(object):
 		with open(self.jsonpath, 'r') as f:
 			self.metadata = json.load(f)
 
-class Sentinel2(DataLoader):
+class Sentinel2(AbstractLoader):
 	"""
 	Sentobject for loading in the S2 data.
 	filepath: path to the directory containing the .tif and json files.
@@ -87,7 +87,7 @@ class Sentinel2(DataLoader):
 			plt.imshow(tif)
 			plt.show()
 
-class Label(DataLoader):
+class Label(AbstractLoader):
 	def __init__(self, filepath):
 		super().__init__(filepath)
 		
