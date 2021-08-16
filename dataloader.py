@@ -123,17 +123,17 @@ def get_file_list(data_json, label_json, req_bands, size_subsample, max_prop_clm
     with open(label_json) as json_file_paths:
       labeldat_Json = json.load(json_file_paths)
 
-
-    # test data path  
-    data_dir = data_json[0:-16]
+    # data path  
+    data_dir = os.path.dirname(data_json)#data_json[0:-16]
     label_dir = os.path.dirname(label_json)
 
     # list of individual stack.JSON/ select subset
-    spec_dat_tifs = [data_dir + '/' + i['href'] for i in alldat_Json['links']]
-    spec_label_tifs = []
-    for tif_dir in spec_dat_tifs:
-      spec_label_tifs.append(label_dir + '/' + label_dir.split('/')[-1] + '_' + tif_dir.split('_')[-4] + '/stac.json')
-
+    data_stac_paths = [os.path.join(data_dir, line['href']) for line in alldat_Json['links']]
+    all_label_paths = [os.path.join(label_dir, line['href']) for line in labeldat_Json['links']]
+    
+    # take only the labels that we have s2 folders for 
+    label_codes = [codename(path, 'label') for path in all_label_paths]
+    label_stac_paths = [all_label_paths[label_codes.index(codename(stac, 's2'))] for stac in data_stac_paths]
 
     if check_files:
       # check the label file exsists:
@@ -148,8 +148,8 @@ def get_file_list(data_json, label_json, req_bands, size_subsample, max_prop_clm
           current_size += 1
         i += 1
     else:
-      existing_dat_tifs = spec_dat_tifs[:size_subsample]
-      existing_label_tifs = spec_label_tifs[:size_subsample]
+      existing_dat_tifs = data_stac_paths[:size_subsample]
+      existing_label_tifs = label_stac_paths[:size_subsample]
     
     ### get collection of individuals band links and put into list/dict
     dict_of_dict = {}
@@ -269,3 +269,13 @@ def generate_splits(data_dict, split_ratios, shuffle=False):
     test_files.append(test_current_ims)
 
   return train_files, test_files
+
+
+def codename(filepath, pathtype='label'):
+  if pathtype == 'label':
+    code_position = -4
+  elif pathtype == 's2':
+    code_position = -1
+  else:
+    raise ValueError('don''t know that pathytpe, should be label or s2')
+  return os.path.basename(os.path.dirname(filepath)).split('_')[code_position]
