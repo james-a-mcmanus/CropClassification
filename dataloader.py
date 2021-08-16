@@ -137,7 +137,7 @@ def get_file_list(data_json, label_json, req_bands, size_subsample, max_prop_clm
     s2_codes = [codename(path,'s2') for path in all_data_paths]
 
     # find those codes which are the same between the two lists
-    common_codes = set(s2_codes).intersection(label_codes)
+    common_codes = list(set(s2_codes).intersection(label_codes))
     common_codes = common_codes[:size_subsample]
 
     # save all the paths to a dict indexed by the code.
