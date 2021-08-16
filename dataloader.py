@@ -30,6 +30,10 @@ import random
 
 jsonpath2 = '/content/drive/MyDrive/CropClassification/Data/Train/train_source_s2/ref_south_africa_crops_competition_v1_train_source_s2/collection.json'
 labeljsonpath2 = '/content/drive/MyDrive/CropClassification/Data/Train/train_labels/ref_south_africa_crops_competition_v1_train_labels/collection.json'
+
+s2_json = '/content/drive/MyDrive/CropClassification/DataRestructured/Train/train_source_s2/ref_south_africa_crops_competition_v1_train_source_s2/collection.json'
+labels_json = '/content/drive/MyDrive/CropClassification/DataRestructured/Train/train_labels/ref_south_africa_crops_competition_v1_train_labels/collection.json'
+
 bands_curr2=['B01','B02','B03','B04','B05','B06','B07','B08','B8A','B09','B11','B12','labels','field_ids']
 
 """# Band helper functions"""
