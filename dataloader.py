@@ -134,22 +134,23 @@ def get_file_list(data_json, label_json, req_bands, size_subsample, max_prop_clm
     # make a list of codenames for each stac-path.
     label_codes = [codename(path, 'label') for path in all_label_paths]
     s2_codes = [codename(path,'s2') for path in all_data_paths]
-    s2_codes_unique = set(s2_codes)
+    #s2_codes_unique = set(s2_codes)
 
-    # find the codenames that don't match between the labels and s2.
-    label_mismatches = [labelcode for labelcode in label_codes if labelcode not in s2_codes_unique]
-    s2_mismatches = [s2code for s2code in s2_codes_unique if s2code not in label_codes]
+    # find those codes which are the same between the two lists
+    common_codes = set(s2_codes).intersection(label_codes)
 
-    # remove paths which are mismatched.
-    s2_json_paths = [s2path for s2path in all_data_paths if codename(s2path,'s2') not in s2_mismatches]
-    label_json_paths = [labelpath for labelpath in all_label_paths if codename(labelpath,'label') not in label_mismatches]
-    
+    json_paths = {}
+    for code in common_codes:
+      found_labels = all_label_paths[label_codes.index(code)]
+      found_s2 = [all_data_paths[idx] for idx, scode in enumerate(s2_codes) if scode == code]
+      json_paths[code] = {'label': found_labels, 's2': found_s2}
+
     ### get collection of individuals band links and put into list/dict
     dict_of_dict = {}
     l_of_dict = []
 
     ## for each folder
-    for label, dat in tqdm(zip(existing_label_tifs, existing_dat_tifs),total=len(existing_label_tifs)):
+    for codes in tqdm(json_paths.keys())#zip(label_json_paths, s2_json_paths),total=len(s2_json_paths)):
         #check if folder exists, elso do none
             # if exist, open individual stack.JSON
       
