@@ -150,7 +150,7 @@ def get_file_list(data_json, label_json, req_bands, size_subsample, max_prop_clm
     l_of_dict = []
 
     ## for each folder
-    for codes in tqdm(json_paths.keys())#zip(label_json_paths, s2_json_paths),total=len(s2_json_paths)):
+    for codes in tqdm(json_paths.keys()):#zip(label_json_paths, s2_json_paths),total=len(s2_json_paths)):
         #check if folder exists, elso do none
             # if exist, open individual stack.JSON
       
