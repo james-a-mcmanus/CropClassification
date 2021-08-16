@@ -235,19 +235,19 @@ class Dataset_multiS2_T1(Dataset):#, Randomizable):
 
     def __getitem__(self, index):
       self.randomize()
-      print(index)
+      #print(index)
       img_images = self.make_image_images(self.s2_file_list, index)
       
 
       lbl = self.loader(self.label_file_list[index])
       lbl_images = self.make_label_images(lbl, 10)
-      print(lbl_images.shape)
+      #print(lbl_images.shape)
       return self.image_transform(img_images), self.label_transform(lbl_images)
 
 
 def generate_splits(data_dict, split_ratios, shuffle=False):
   bands = list(data_dict.keys())
-  kf = KFold(n_splits=5, shuffle=shuffle)
+  kf = KFold(n_splits=split_ratios, shuffle=shuffle)
   train_files = list()
   test_files = list()
   
