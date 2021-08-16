@@ -108,7 +108,7 @@ def get_Dict_data(path_to_collection,req_bands, size_subsample, max_prop_clm, ch
 
 """# Create bands + label dictionary"""
 
-def get_file_list(data_json, label_json, req_bands, size_subsample, max_prop_clm, check_clouds=False):# path_to_collection,req_bands, size_subsample, max_prop_clm, check_clouds=False):
+def get_file_list(data_json, label_json, req_bands, size_subsample, max_prop_clm, check_clouds=False, check_files=True):# path_to_collection,req_bands, size_subsample, max_prop_clm, check_clouds=False):
     #Args
     #> path to collection.Json
     #> which bands? - List of strings e.g. ['B02']
@@ -134,17 +134,22 @@ def get_file_list(data_json, label_json, req_bands, size_subsample, max_prop_clm
     for tif_dir in spec_dat_tifs:
       spec_label_tifs.append(label_dir + '/' + label_dir.split('/')[-1] + '_' + tif_dir.split('_')[-4] + '/stac.json')
 
-    # check the label file exsists:
-    current_size = 0
-    i = 0
-    existing_label_tifs = []
-    existing_dat_tifs = []
-    while (current_size < size_subsample):
-      if os.path.exists(spec_label_tifs[i]) and os.path.exists(spec_dat_tifs[i]):
-        existing_label_tifs.append(spec_label_tifs[i])
-        existing_dat_tifs.append(spec_dat_tifs[i])
-        current_size += 1
-      i += 1
+
+    if check_files:
+      # check the label file exsists:
+      current_size = 0
+      i = 0
+      existing_label_tifs = []
+      existing_dat_tifs = []
+      while (current_size < size_subsample):
+        if os.path.exists(spec_label_tifs[i]) and os.path.exists(spec_dat_tifs[i]):
+          existing_label_tifs.append(spec_label_tifs[i])
+          existing_dat_tifs.append(spec_dat_tifs[i])
+          current_size += 1
+        i += 1
+    else:
+      spec_dat_tifs = spec_dat_tifs[:size_subsample]
+      spec_label_tifs = spec_label_tifs[:size_subsample]
     
     ### get collection of individuals band links and put into list/dict
     dict_of_dict = {}
