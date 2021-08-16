@@ -148,8 +148,8 @@ def get_file_list(data_json, label_json, req_bands, size_subsample, max_prop_clm
           current_size += 1
         i += 1
     else:
-      spec_dat_tifs = spec_dat_tifs[:size_subsample]
-      spec_label_tifs = spec_label_tifs[:size_subsample]
+      existing_dat_tifs = spec_dat_tifs[:size_subsample]
+      existing_label_tifs = spec_label_tifs[:size_subsample]
     
     ### get collection of individuals band links and put into list/dict
     dict_of_dict = {}
