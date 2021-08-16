@@ -273,9 +273,9 @@ def generate_splits(data_dict, split_ratios, shuffle=False):
 
 def codename(filepath, pathtype='label'):
   if pathtype == 'label':
-    code_position = -4
-  elif pathtype == 's2':
     code_position = -1
+  elif pathtype == 's2':
+    code_position = -4
   else:
     raise ValueError('don''t know that pathytpe, should be label or s2')
   return os.path.basename(os.path.dirname(filepath)).split('_')[code_position]
