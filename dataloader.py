@@ -108,7 +108,7 @@ def get_Dict_data(path_to_collection,req_bands, size_subsample, max_prop_clm, ch
 
 """# Create bands + label dictionary"""
 
-def get_file_list(data_json, label_json, req_bands, size_subsample, max_prop_clm, check_clouds=False, check_files=True):# path_to_collection,req_bands, size_subsample, max_prop_clm, check_clouds=False):
+def get_file_list(data_json, label_json, req_bands, size_subsample, max_prop_clm, check_clouds=False):# path_to_collection,req_bands, size_subsample, max_prop_clm, check_clouds=False):
     #Args
     #> path to collection.Json
     #> which bands? - List of strings e.g. ['B02']
@@ -128,28 +128,21 @@ def get_file_list(data_json, label_json, req_bands, size_subsample, max_prop_clm
     label_dir = os.path.dirname(label_json)
 
     # list of individual stack.JSON/ select subset
-    data_stac_paths = [os.path.join(data_dir, line['href']) for line in alldat_Json['links']]
+    all_data_paths = [os.path.join(data_dir, line['href']) for line in alldat_Json['links']]
     all_label_paths = [os.path.join(label_dir, line['href']) for line in labeldat_Json['links']]
-    
-    # take only the labels that we have s2 folders for 
-    label_codes = [codename(path, 'label') for path in all_label_paths]
-    label_stac_paths = [all_label_paths[label_codes.index(codename(stac, 's2'))] for stac in data_stac_paths]
 
-    if check_files:
-      # check the label file exsists:
-      current_size = 0
-      i = 0
-      existing_label_tifs = []
-      existing_dat_tifs = []
-      while (current_size < size_subsample):
-        if os.path.exists(spec_label_tifs[i]) and os.path.exists(spec_dat_tifs[i]):
-          existing_label_tifs.append(spec_label_tifs[i])
-          existing_dat_tifs.append(spec_dat_tifs[i])
-          current_size += 1
-        i += 1
-    else:
-      existing_dat_tifs = data_stac_paths[:size_subsample]
-      existing_label_tifs = label_stac_paths[:size_subsample]
+    # make a list of codenames for each stac-path.
+    label_codes = [codename(path, 'label') for path in all_label_paths]
+    s2_codes = [codename(path,'s2') for path in all_data_paths]
+    s2_codes_unique = set(s2_codes)
+
+    # find the codenames that don't match between the labels and s2.
+    label_mismatches = [labelcode for labelcode in label_codes if labelcode not in s2_codes_unique]
+    s2_mismatches = [s2code for s2code in s2_codes_unique if s2code not in label_codes]
+
+    # remove paths which are mismatched.
+    s2_json_paths = [s2path for s2path in all_data_paths if codename(s2path,'s2') not in s2_mismatches]
+    label_json_paths = [labelpath for labelpath in all_label_paths if codename(labelpath,'label') not in label_mismatches]
     
     ### get collection of individuals band links and put into list/dict
     dict_of_dict = {}
