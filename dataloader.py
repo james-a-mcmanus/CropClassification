@@ -284,9 +284,9 @@ def codename(filepath, pathtype='label'):
 
 def choose_clearest_day(paths_to_stacs):
   cloud_coverage = np.zeros(len(paths_to_stacs))
-  for stacpath in paths_to_stacs:
+  for i, stacpath in enumerate(paths_to_stacs):
     with open(stacpath, 'r') as f:
       meta_data = json.load(f)
     clm_path = metadata['CLM']['href']
-    cloud_coverage.append(proportion_cloud(clm_path))
-  return paths_to_stacs[np.argmax(np.array(cloud_coverage))]
+    cloud_coverage[i] = proportion_cloud(clm_path)
+  return paths_to_stacs[np.argmin(np.array(cloud_coverage))]
