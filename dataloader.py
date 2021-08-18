@@ -39,6 +39,8 @@ bands_curr2=['B01','B02','B03','B04','B05','B06','B07','B08','B8A','B09','B11','
 """# Band helper functions"""
 
 def proportion_cloud(path_picture):
+    with rasterio.open(path_picture) as i:
+      img = i.read()
     img = io.imread(path_picture)
     prop_cloud = img.sum()/(256*256*255)  
     return(prop_cloud)
@@ -280,3 +282,12 @@ def codename(filepath, pathtype='label'):
   else:
     raise ValueError('don''t know that pathytpe, should be label or s2')
   return os.path.basename(os.path.dirname(filepath)).split('_')[code_position]
+
+def choose_clearest_day(paths_to_stacs):
+  cloud_coverage = np.zeros(len(paths_to_stacs))
+  for stacpath in paths_to_stacs:
+    with open(stacpath, 'r') as f:
+      meta_data = json.load(f)
+    clm_path = metadata['CLM']['href']
+    cloud_coverage.append(proportion_cloud(clm_path))
+  return paths_to_stacs[np.argmax(np.array(cloud_coverage))]
