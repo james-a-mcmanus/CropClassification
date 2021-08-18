@@ -41,7 +41,6 @@ bands_curr2=['B01','B02','B03','B04','B05','B06','B07','B08','B8A','B09','B11','
 def proportion_cloud(path_picture):
     with rasterio.open(path_picture) as i:
       img = i.read()
-    img = io.imread(path_picture)
     prop_cloud = img.sum()/(256*256*255)  
     return(prop_cloud)
 
